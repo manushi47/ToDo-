@@ -1,40 +1,63 @@
 import React, { useState } from "react";
 import { Checkbox, Button, Space, Modal, Input } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-export default function Home() {
+import moment from "moment";
+const Home = () => {
   const [tasks, setTasks] = useState([
-    { id: 1, title: "Test 1", createdDate: "05/14", completed: false },
-    { id: 2, title: "Test 2", completed: true }
+    {
+      id: 1,
+      title: "Test 1",
+      createdDate: "2023-03-20",
+      modifiedDate: "2023-03-20",
+      completed: false
+    },
+    {
+      id: 2,
+      title: "Test 2",
+      createdDate: "2023-03-20",
+      modifiedDate: "2023-03-21",
+      completed: true
+    }
   ]);
-  const onChange = (e: any) => {
-    console.log(`checked = ${e.task.checked}`);
-  };
+
+  const [updateText, setUpdateText] = useState<string>("");
+  const [value, setValue] = useState<string>("");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedTask, setselectedTask] = useState<any>();
+  const [isComplete, setIsComplete] = useState<boolean>();
+
   const handleDeleteTask = (idToDelete: number) => {
     const updatedTasks = tasks.filter(task => task.id !== idToDelete);
     setTasks(updatedTasks);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const showModal = () => {
     setIsModalOpen(true);
   };
-
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-
+  
   const handleCancel = () => {
     setIsModalOpen(false);
+    setselectedTask(undefined);
   };
 
-  const [value, setValue] = useState("");
+
+  const handleOk = () => {
+    if (selectedTask) {
+      const index = selectedTask.id - 1;
+      const updateTask = {...selectedTask, title:updateText === "" ? selectedTask.title : updateText, modifiedDate:moment().format("YYYY-MM-DD"),completed:isComplete === selectedTask.completed? selectedTask.completed : isComplete} 
+        tasks[index] = updateTask;
+        setUpdateText("");
+        handleCancel();
+    }
+  };
 
   function add() {
     const newTask = {
       id: tasks.length + 1,
       title: value,
-      completed: false
+      completed: false,
+      createdDate: moment().format("YYYY-MM-DD"),
+      modifiedDate: moment().format("YYYY-MM-DD")
     };
     console.log("new task", newTask);
 
@@ -44,9 +67,10 @@ export default function Home() {
   return (
     <div style={{ margin: 10 }}>
       <h1 style={{ textAlign: "center" }}>ToDo List</h1>
-
-      <div>
-        <input
+  <div>
+      <Space direction="horizontal">
+        <Input
+        style={{width: 550}}
           type="text"
           name="New Task"
           placeholder="Input Task"
@@ -56,35 +80,53 @@ export default function Home() {
         <Button type="primary" style={{ margin: "10px 0px" }} onClick={add}>
           Add Task
         </Button>
+      </Space>
       </div>
 
       <Space direction="vertical">
         {tasks.map(task => (
           <div>
-            <Checkbox onChange={onChange} checked={task.completed}>
+            <span style={task.completed ? {textDecoration:'line-through'} : {}} >
               {task.title}
-            </Checkbox>
+            </span>
             <Button
               type="text"
               onClick={() => handleDeleteTask(task.id)}
               icon={<DeleteOutlined />}
             />
-            <Button type="text" onClick={showModal} icon={<EditOutlined />} />
-
-            <Modal
-              title="Edit Task"
-              open={isModalOpen}
-              onOk={handleOk}
-              onCancel={handleCancel}
-            >
-              <Input placeholder="id" />
-              <Input placeholder="name" />
-              <Input placeholder="created date" />
-              <Input placeholder="modified date" />
-            </Modal>
+            <Button
+              type="text"
+              onClick={() => {
+                setselectedTask(task);
+                showModal();
+              }}
+              icon={<EditOutlined />}
+            />
           </div>
         ))}
       </Space>
+      {selectedTask && (
+  <Modal
+  title="Edit Task"
+  open={isModalOpen}
+  onOk={handleOk}
+  onCancel={handleCancel}
+>
+  <Input disabled placeholder="id" defaultValue={selectedTask?.id} />
+  <Input onChange={e => setUpdateText(e.target.value)} placeholder="name" defaultValue={selectedTask?.title} />
+  <Checkbox onChange={e => setIsComplete(e.target.checked)} defaultChecked={selectedTask?.completed}>
+      Completed
+  </Checkbox>
+  <Input
+    disabled
+    placeholder="created date"
+    defaultValue={selectedTask?.createdDate}
+  />
+</Modal>
+      )}
+    
     </div>
   );
-}
+};
+
+export default Home;
