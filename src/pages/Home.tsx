@@ -65,7 +65,8 @@ const Home = () => {
     setValue("");
   }
   return (
-    <div style={{ margin: 10 }}>
+    <div style={{backgroundColor: "lightblue", padding: 35}}>
+    <div style={{ margin: 10 , justifyContent: "center", alignItems: "center"}}>
       <h1 style={{ textAlign: "center" }}>ToDo List</h1>
   <div>
       <Space direction="horizontal">
@@ -112,20 +113,38 @@ const Home = () => {
   onOk={handleOk}
   onCancel={handleCancel}
 >
+<label style={{ display: "block", marginBottom: 5 }}>ID:</label>
   <Input disabled placeholder="id" defaultValue={selectedTask?.id} />
+  <label style={{ display: "block", marginBottom: 5 }}>Name:</label>
   <Input onChange={e => setUpdateText(e.target.value)} placeholder="name" defaultValue={selectedTask?.title} />
+  <label style={{ display: "block", marginBottom: 5 }}>
   <Checkbox onChange={e => setIsComplete(e.target.checked)} defaultChecked={selectedTask?.completed}>
       Completed
   </Checkbox>
+
+  </label>
+  <label style={{ display: "block", marginBottom: 5 }}>
+    Created Date:
+  </label>
+
   <Input
     disabled
     placeholder="created date"
     defaultValue={selectedTask?.createdDate}
   />
+
+  <label style={{ display: "block", marginBottom: 5 }}>
+  Modified Date:
+  </label>
+  <Input
+    disabled
+    placeholder="modifiedDate"
+    defaultValue={selectedTask?.modifiedDate}
+  />
 </Modal>
       )}
     
-    </div>
+    </div></div>
   );
 };
 
